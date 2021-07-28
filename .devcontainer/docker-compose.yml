@@ -1,0 +1,80 @@
+version: "3.7"
+
+services:
+  elasticsearch:
+    image: elasticsearch:6.8.12
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - "discovery.type=single-node"
+      - "cluster.name=personium"
+      - "network.host=0.0.0.0"
+      - "action.auto_create_index=.watches,.triggered_watches,.watcher-history-*"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=*"
+      - "indices.fielddata.cache.size=80%"
+
+  activemq:
+    image: rmohr/activemq:5.15.9
+    ports:
+      - 61616:61616
+      - 8161:8161
+
+  memcached-lock:
+    image: memcached:1.6.7
+    ports:
+      - 11211:11211
+
+  memcached-cache:
+    image: memcached:1.6.7
+    ports:
+      - 11212:11211
+
+  personium-core:
+    build:
+      context: ./dockerfiles/personium-core
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - elasticsearch
+      - activemq
+      - memcached-lock
+      - memcached-cache
+    environment:
+      - >-
+        JAVA_OPTS=
+        -Dio.personium.configurationFile=/personium/personium-core/personium-core-unit-config.properties
+        -Dlogback.configurationFile=/opt/logback/logback.xml 
+      - PERSONIUM_UID=1000
+      - PERSONIUM_GID=1000
+    volumes:
+      - type: bind
+        source: ./dockerfiles/personium-core/personium-core-unit-config.properties
+        target: /personium/personium-core/personium-core-unit-config.properties
+      - type: bind
+        source: ./dockerfiles/personium-core/logback.xml
+        target: /opt/logback/logback.xml
+      - type: bind
+        source: ./dockerfiles/personium-core/etc/x509/
+        target: /opt/x509/
+      - personium_data:/personium_nfs
+
+  personium-engine-dev:
+    image: ghcr.io/yoh1496/adoptopenjdk-8-vscode:latest
+    volumes:
+      - personium_data:/personium_nfs
+
+
+  nginx:
+    build:
+      context: ./dockerfiles/nginx
+    ports:
+      - 80:80
+
+networks:
+  default:
+
+volumes:
+  personium_data:
+    driver: local

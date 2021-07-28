@@ -1,0 +1,13 @@
+{
+    "name": "Personium Engine Development Container",
+    "dockerComposeFile": [
+        "docker-compose.yml",
+        "docker-compose.devcontainer.yml"
+    ],
+    "service": "personium-engine-dev",
+    "workspaceFolder": "/workspace/dev.code-workspace",
+    "shutdownAction": "stopCompose",
+    "extensions": [
+        "vscjava.vscode-java-pack"
+    ],
+}

@@ -1,0 +1,12 @@
+{
+    "folders": [
+        {
+            "name": "presonium-engine",
+            "path": "/workspace/personium-engine"
+        },
+        {
+            "name": "personium-client-java",
+            "path": "/workspace/personium-client-java"
+        },
+    ]
+}
