@@ -8,5 +8,9 @@
             "name": "personium-client-java",
             "path": "/workspace/personium-client-java"
         },
-    ]
+    ],
+    "settings": {
+        "terminal.integrated.experimentalLinkProvider": false,
+        "terminal.integrated.gpuAcceleration": "auto"
+    }
 }
